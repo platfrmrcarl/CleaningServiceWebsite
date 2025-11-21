@@ -14,6 +14,7 @@
     "imagesloaded": "^5.0.0",
     "isotope-layout": "^3.0.6",
     "next": "16.0.3",
+    "next-auth": "^5.0.0-beta.30",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "wowjs": "^1.1.3"

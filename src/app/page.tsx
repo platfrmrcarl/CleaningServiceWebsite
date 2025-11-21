@@ -2,10 +2,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSession, signIn, signOut } from "next-auth/react";
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
+  const { data: session } = useSession();
   useEffect(() => {
     // WOW.js init
     if (typeof window !== 'undefined') {
@@ -159,13 +161,25 @@ export default function Home() {
                   </ul>
                 </nav>
               </div>
-              <div className="sm:flex justify-end hidden pr-16 lg:pr-0">
-                <a
-                  href="#contact"
-                  className="text-base font-bold text-white bg-primary rounded-full py-3 px-8 md:px-9 lg:px-8 xl:px-9 hover:shadow-signUp hover:bg-primary/90 transition ease-in-out duration-300"
-                >
-                  Get a Quote
-                </a>
+              <div className="sm:flex justify-end hidden pr-16 lg:pr-0 items-center gap-4">
+                {session ? (
+                  <>
+                    <span className="text-black font-medium">Hi, {session.user?.name}</span>
+                    <button
+                      onClick={() => signOut()}
+                      className="text-base font-bold text-white bg-red-500 rounded-full py-3 px-8 md:px-9 lg:px-8 xl:px-9 hover:shadow-signUp hover:bg-red-600 transition ease-in-out duration-300"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => signIn("google")}
+                    className="text-base font-bold text-white bg-primary rounded-full py-3 px-8 md:px-9 lg:px-8 xl:px-9 hover:shadow-signUp hover:bg-primary/90 transition ease-in-out duration-300"
+                  >
+                    Login
+                  </button>
+                )}
               </div>
             </div>
           </div>
