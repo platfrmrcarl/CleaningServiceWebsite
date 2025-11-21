@@ -1,0 +1,1324 @@
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+
+export default function Home() {
+  useEffect(() => {
+    // WOW.js init
+    if (typeof window !== 'undefined') {
+      import('wowjs').then((WOW) => {
+        new WOW.WOW().init();
+      });
+    }
+
+    // Menu scroll logic
+    const onScroll = () => {
+      const sections = document.querySelectorAll('.menu-scroll');
+      const scrollPos = window.scrollY || document.documentElement.scrollTop;
+
+      sections.forEach((currLink) => {
+        const val = currLink.getAttribute('href');
+        if (val && val.startsWith('#')) {
+          const refElement = document.querySelector(val) as HTMLElement;
+          if (refElement) {
+            const scrollTopMinus = scrollPos + 73;
+            if (
+              refElement.offsetTop <= scrollTopMinus &&
+              refElement.offsetTop + refElement.offsetHeight > scrollTopMinus
+            ) {
+              document.querySelector('.menu-scroll.active')?.classList.remove('active');
+              currLink.classList.add('active');
+            } else {
+              currLink.classList.remove('active');
+            }
+          }
+        }
+      });
+    };
+
+    window.addEventListener('scroll', onScroll);
+
+    // Tab logic
+    const handleTabClick = (e: Event) => {
+      const button = e.currentTarget as HTMLElement;
+      const targetId = button.getAttribute('data-tab-target');
+
+      // Find the parent list to deactivate siblings
+      const parentUl = button.closest('ul');
+      if (!parentUl) return;
+
+      const siblingButtons = parentUl.querySelectorAll('.tab-button-vertical');
+
+      // Inactive/Active classes
+      const inactiveClasses = ['border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:font-bold'];
+      const activeClasses = ['font-bold', 'text-blue-600', 'border-blue-600', 'active-tab-style'];
+
+      siblingButtons.forEach(btn => {
+        btn.classList.remove(...activeClasses);
+        btn.classList.add(...inactiveClasses);
+        btn.setAttribute('aria-selected', 'false');
+      });
+
+      button.classList.remove(...inactiveClasses);
+      button.classList.add(...activeClasses);
+      button.setAttribute('aria-selected', 'true');
+
+      // Hide all content in this section
+      const flexContainer = parentUl.closest('.flex');
+      if (!flexContainer) return;
+
+      const contentContainer = flexContainer.querySelector('.tab-content-container');
+      if (!contentContainer) return;
+
+      const allContents = contentContainer.querySelectorAll('.tab-content-vertical');
+
+      allContents.forEach(content => {
+        content.classList.add('hidden');
+      });
+
+      if (targetId) {
+        const targetContent = document.querySelector(targetId);
+        if (targetContent) {
+          targetContent.classList.remove('hidden');
+        }
+      }
+    };
+
+    const tabButtons = document.querySelectorAll('.tab-button-vertical');
+    tabButtons.forEach(btn => btn.addEventListener('click', handleTabClick));
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      tabButtons.forEach(btn => btn.removeEventListener('click', handleTabClick));
+    };
+  }, []);
+
+  return (
+    <main>
+
+      {/* ====== Navbar Section Start */}
+      <header className="header bg-transparent absolute top-0 left-0 z-40 w-full flex items-center transition">
+        <div className="container">
+          <div className="flex mx-[-16px] items-center justify-between relative">
+            <div className="px-4 w-60 max-w-full">
+              <a href="index.html" className="header-logo w-full block py-6 lg:py-8">
+                <img src="/images/logo/flogo.png" alt="logo" className="w-full" width="123" height="16" />
+              </a>
+            </div>
+            <div className="flex px-4 justify-between items-center w-full">
+              <div>
+                <button
+                  id="navbarToggler"
+                  name="navbarToggler"
+                  aria-label="navbarToggler"
+                  className="block absolute right-4 top-1/2 translate-y-[-50%] lg:hidden focus:ring-2 ring-primary px-3 py-[6px] rounded-lg"
+                >
+                  <span className="relative w-[30px] h-[2px] my-[6px] block bg-dark"></span>
+                  <span className="relative w-[30px] h-[2px] my-[6px] block bg-dark"></span>
+                  <span className="relative w-[30px] h-[2px] my-[6px] block bg-dark"></span>
+                </button>
+                <nav
+                  id="navbarCollapse"
+                  className="absolute py-5 lg:py-0 lg:px-4 xl:px-6 bg-white lg:bg-transparent shadow-lg rounded-lg max-w-[250px] w-full lg:max-w-full lg:w-full right-4 top-full hidden lg:block lg:static lg:shadow-none mb-20"
+                >
+                  <ul className="blcok lg:flex">
+                    <li className="relative group">
+                      <a href="#home" className="menu-scroll text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:px-0 flex mx-8 lg:mr-0"> Home </a>
+                    </li>
+                    <li className="relative group">
+                      <a href="#about" className="menu-scroll text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:px-0 flex mx-8 lg:mr-0 lg:ml-8 xl:ml-12"> About </a>
+                    </li>
+                    <li className="relative group">
+                      <a href="#services" className="menu-scroll text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:px-0 flex mx-8 lg:mr-0 lg:ml-8 xl:ml-12"> Services </a>
+                    </li>
+                    <li className="relative group">
+                      <a href="#pricing" className="menu-scroll text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:px-0 flex mx-8 lg:mr-0 lg:ml-8 xl:ml-12"> Pricing </a>
+                    </li>
+                    <li className="relative group">
+                      <a href="#contact" className="menu-scroll text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:px-0 flex mx-8 lg:mr-0 lg:ml-8 xl:ml-12"> Contact </a>
+                    </li>
+                    <li className="relative group submenu-item">
+                      <a
+                        href="javascript:void(0)"
+                        className="text-base text-black group-hover:text-primary py-2 lg:py-6 lg:inline-flex lg:pl-0 lg:pr-4 flex mx-8 lg:mr-0 lg:ml-8 xl:ml-12 relative after:absolute after:w-2 after:h-2 after:border-b-2 after:border-r-2 after:border-current after:rotate-45 lg:after:right-0 after:right-1 after:top-1/2 after:translate-y-[-50%] after:mt-[-2px]"
+                      >
+                        Pages
+                      </a>
+                      <div
+                        className="submenu hidden relative lg:absolute w-[250px] top-full lg:top-[110%] left-0 rounded-sm lg:shadow-lg p-4 lg:block lg:opacity-0 lg:invisible group-hover:opacity-100 lg:group-hover:visible lg:group-hover:top-full bg-white transition-[top] duration-300"
+                      >
+                        <a href="portfolio-details.html" className="block text-sm text-black rounded hover:text-primary py-[10px] px-4"> Portfolio Details Page </a>
+
+                        <a href="blog-grids.html" className="block text-sm text-black rounded hover:text-primary py-[10px] px-4"> Blog Grids Page </a>
+                        <a href="blog-details.html" className="block text-sm text-black rounded hover:text-primary py-[10px] px-4"> Blog Details Page </a>
+                      </div>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <div className="sm:flex justify-end hidden pr-16 lg:pr-0">
+                <a
+                  href="#contact"
+                  className="text-base font-bold text-white bg-primary rounded-full py-3 px-8 md:px-9 lg:px-8 xl:px-9 hover:shadow-signUp hover:bg-primary/90 transition ease-in-out duration-300"
+                >
+                  Get a Quote
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      {/* ====== Navbar Section End */}
+
+      {/* ====== Hero Section Start */}
+      <div id="home" className="relative pt-[120px] lg:pt-[150px] pb-[110px] ml-40 bg-white">
+        <br />
+        <br />
+        <br />
+        <div className="container">
+          <div className="flex flex-wrap -mx-4">
+            <div className="w-full lg:w-5/12 px-4">
+              <div className="hero-content">
+                <h1 className="text-dark font-bold text-4xl sm:text-[42px] lg:text-[40px] xl:text-[42px] leading-snug mb-3">
+                  Your Next Guest's<br />
+                  First Impression!<br />
+                </h1>
+                <p className="text-base mb-8 text-body-color max-w-[480px]">
+                  You can count on a spotless guest-ready space every time.
+                </p>
+                <ul className="flex flex-wrap items-center">
+                  <li>
+                    <a
+                      href="javascript:void(0)"
+                      className="py-4 px-10 lg:px-8 xl:px-10 inline-flex items-center justify-center text-center text-white text-base bg-primary hover:bg-primary/90 font-normal rounded-lg"
+                    >
+                      Get a Quote
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="hidden lg:block lg:w-1/12 px-4"></div>
+            <div className="w-full lg:w-6/12 px-4">
+              <div className="lg:text-right lg:ml-auto">
+                <div className="relative inline-block z-10 pt-11 lg:pt-0">
+                  <img src="/images/hero/clean_01.jpeg" alt="hero" className="max-w-full lg:ml-auto" />
+                  <span className="absolute -left-8 -bottom-8 z-[-1]">
+                    <svg width="93" height="93" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="2.5" cy="2.5" r="2.5" fill="#3056D3" />
+                      <circle cx="2.5" cy="24.5" r="2.5" fill="#3056D3" />
+                      <circle cx="2.5" cy="46.5" r="2.5" fill="#3056D3" />
+                      <circle cx="2.5" cy="68.5" r="2.5" fill="#3056D3" />
+                      <circle cx="2.5" cy="90.5" r="2.5" fill="#3056D3" />
+                      <circle cx="24.5" cy="2.5" r="2.5" fill="#3056D3" />
+                      <circle cx="24.5" cy="24.5" r="2.5" fill="#3056D3" />
+                      <circle cx="24.5" cy="46.5" r="2.5" fill="#3056D3" />
+                      <circle cx="24.5" cy="68.5" r="2.5" fill="#3056D3" />
+                      <circle cx="24.5" cy="90.5" r="2.5" fill="#3056D3" />
+                      <circle cx="46.5" cy="2.5" r="2.5" fill="#3056D3" />
+                      <circle cx="46.5" cy="24.5" r="2.5" fill="#3056D3" />
+                      <circle cx="46.5" cy="46.5" r="2.5" fill="#3056D3" />
+                      <circle cx="46.5" cy="68.5" r="2.5" fill="#3056D3" />
+                      <circle cx="46.5" cy="90.5" r="2.5" fill="#3056D3" />
+                      <circle cx="68.5" cy="2.5" r="2.5" fill="#3056D3" />
+                      <circle cx="68.5" cy="24.5" r="2.5" fill="#3056D3" />
+                      <circle cx="68.5" cy="46.5" r="2.5" fill="#3056D3" />
+                      <circle cx="68.5" cy="68.5" r="2.5" fill="#3056D3" />
+                      <circle cx="68.5" cy="90.5" r="2.5" fill="#3056D3" />
+                      <circle cx="90.5" cy="2.5" r="2.5" fill="#3056D3" />
+                      <circle cx="90.5" cy="24.5" r="2.5" fill="#3056D3" />
+                      <circle cx="90.5" cy="46.5" r="2.5" fill="#3056D3" />
+                      <circle cx="90.5" cy="68.5" r="2.5" fill="#3056D3" />
+                      <circle cx="90.5" cy="90.5" r="2.5" fill="#3056D3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ====== Hero Section End */}
+
+      {/* ====== About Section Start */}
+      <section id="about" className="pt-[145px] pb-[120px] relative z-10">
+        <div className="container">
+          <div className="flex flex-wrap mx-[-16px]">
+            <div className="w-full lg:w-1/2 xl:w-7/12 px-4 mb-8 lg:mb-0">
+              <span className="font-bold text-primary text-lg md:text-xl mb-3"> ABOUT US </span>
+              <h2 className="max-w-[400px] font-bold text-black text-3xl sm:text-4xl md:text-[45px] leading-tight sm:leading-tight md:leading-tight mb-5">Better design, better experience</h2>
+              <p className="max-w-[570px] font-medium text-base text-body-color">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque dui ligula, malesuada vel convallis in, tincidunt ut mi Vestibulum sit amet.
+              </p>
+            </div>
+            <div className="w-full lg:w-1/2 xl:w-5/12 px-4">
+              <h3 className="font-semibold text-black text-2xl md:text-3xl mb-6">Connect With Us</h3>
+              <p className="font-medium text-base text-body-color mb-10">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque dui ligula, malesuada vel convallis in, tincidunt ut mi. Vestibulum sit amet urna placerat, tempor soloa demanium testi
+                lor Aliq lorem vitae semper tempor.
+              </p>
+              <div className="flex items-center">
+                <a
+                  href="javascript:void(0)"
+                  className="w-9 h-9 mr-3 rounded-full flex items-center justify-center border border-[#E5E8F2] text-body-color hover:bg-primary hover:border-primary hover:text-white"
+                  aria-label="social-link"
+
+                >
+                  <svg width="7" height="14" viewBox="0 0 7 14" className="fill-current">
+                    <path
+                      d="M6.50914 5.6H5.42429H5.03684V5.14839V3.74839V3.29677H5.42429H6.23793C6.45103 3.29677 6.62538 3.11613 6.62538 2.84516V0.451613C6.62538 0.203226 6.4704 0 6.23793 0H4.82374C3.29332 0 2.22783 1.26452 2.22783 3.13871V5.10323V5.55484H1.84038H0.523056C0.251842 5.55484 0 5.80323 0 6.16452V7.79032C0 8.10645 0.213097 8.4 0.523056 8.4H1.80164H2.18909V8.85161V13.3903C2.18909 13.7065 2.40218 14 2.71214 14H4.53315C4.64939 14 4.74625 13.9323 4.82374 13.8419C4.90123 13.7516 4.95935 13.5935 4.95935 13.4581V8.87419V8.42258H5.36617H6.23793C6.48977 8.42258 6.6835 8.24194 6.72224 7.97097V7.94839V7.92581L6.99346 6.36774C7.01283 6.20968 6.99345 6.02903 6.87722 5.84839C6.83848 5.73548 6.66412 5.62258 6.50914 5.6Z"
+                    />
+                  </svg>
+                </a>
+                <a
+                  href="javascript:void(0)"
+                  className="w-9 h-9 mr-3 rounded-full flex items-center justify-center border border-[#E5E8F2] text-body-color hover:bg-primary hover:border-primary hover:text-white"
+                  aria-label="social-link"
+
+                >
+                  <svg width="19" height="14" viewBox="0 0 19 14" className="fill-current">
+                    <path
+                      d="M16.5892 2.41096L17.7333 1.09589C18.0645 0.739726 18.1548 0.465753 18.1849 0.328767C17.2817 0.821918 16.4387 0.986301 15.8968 0.986301H15.686L15.5656 0.876712C14.843 0.30137 13.9398 0 12.9763 0C10.8688 0 9.2129 1.58904 9.2129 3.42466C9.2129 3.53425 9.2129 3.69863 9.24301 3.80822L9.33333 4.35616L8.70107 4.32877C4.84731 4.21918 1.68602 1.20548 1.17419 0.684932C0.331183 2.05479 0.812903 3.36986 1.32473 4.19178L2.34839 5.72603L0.722581 4.90411C0.752688 6.05479 1.23441 6.9589 2.16774 7.61644L2.98064 8.16438L2.16774 8.46575C2.67957 9.86301 3.82366 10.4384 4.66667 10.6575L5.78064 10.9315L4.72688 11.589C3.04086 12.6849 0.933333 12.6027 0 12.5205C1.89677 13.726 4.15484 14 5.72043 14C6.89462 14 7.76774 13.8904 7.97849 13.8082C16.4086 12 16.8 5.15068 16.8 3.78082V3.58904L16.9806 3.47945C18.0043 2.60274 18.4258 2.13699 18.6667 1.86301C18.5763 1.89041 18.4559 1.94521 18.3355 1.9726L16.5892 2.41096Z"
+                    />
+                  </svg>
+                </a>
+                <a
+                  href="javascript:void(0)"
+                  className="w-9 h-9 mr-3 rounded-full flex items-center justify-center border border-[#E5E8F2] text-body-color hover:bg-primary hover:border-primary hover:text-white"
+                  aria-label="social-link"
+
+                >
+                  <svg width="19" height="14" viewBox="0 0 19 14" className="fill-current">
+                    <path
+                      d="M18.2753 2.19355C18.0645 1.32258 17.4323 0.645161 16.6194 0.419355C15.1742 7.69092e-08 9.33333 0 9.33333 0C9.33333 0 3.49247 7.69092e-08 2.04731 0.419355C1.23441 0.645161 0.60215 1.32258 0.391398 2.19355C0 3.77419 0 7 0 7C0 7 0 10.2581 0.391398 11.8065C0.60215 12.6774 1.23441 13.3548 2.04731 13.5806C3.49247 14 9.33333 14 9.33333 14C9.33333 14 15.1742 14 16.6194 13.5806C17.4323 13.3548 18.0645 12.6774 18.2753 11.8065C18.6667 10.2581 18.6667 7 18.6667 7C18.6667 7 18.6667 3.77419 18.2753 2.19355ZM7.46667 10V4L12.314 7L7.46667 10Z"
+                    />
+                  </svg>
+                </a>
+                <a
+                  href="javascript:void(0)"
+                  className="w-9 h-9 mr-3 rounded-full flex items-center justify-center border border-[#E5E8F2] text-body-color hover:bg-primary hover:border-primary hover:text-white"
+                  aria-label="social-link"
+
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" className="fill-current">
+                    <path
+                      d="M13.0214 0H1.02084C0.453707 0 0 0.451613 0 1.01613V12.9839C0 13.5258 0.453707 14 1.02084 14H12.976C13.5432 14 13.9969 13.5484 13.9969 12.9839V0.993548C14.0422 0.451613 13.5885 0 13.0214 0ZM4.15142 11.9H2.08705V5.23871H4.15142V11.9ZM3.10789 4.3129C2.42733 4.3129 1.90557 3.77097 1.90557 3.11613C1.90557 2.46129 2.45002 1.91935 3.10789 1.91935C3.76577 1.91935 4.31022 2.46129 4.31022 3.11613C4.31022 3.77097 3.81114 4.3129 3.10789 4.3129ZM11.9779 11.9H9.9135V8.67097C9.9135 7.90323 9.89082 6.8871 8.82461 6.8871C7.73571 6.8871 7.57691 7.74516 7.57691 8.60322V11.9H5.51254V5.23871H7.53154V6.16452H7.55423C7.84914 5.62258 8.50701 5.08065 9.52785 5.08065C11.6376 5.08065 12.0232 6.43548 12.0232 8.2871V11.9H11.9779Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+          <svg width="60" height="120" viewBox="0 0 60 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="60" fill="url(#paint0_radial_18:24)" />
+            <defs>
+              <radialGradient id="paint0_radial_18:24" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60) rotate(90) scale(120)">
+                <stop stopColor="white" />
+                <stop offset="0.569" stopColor="#F0F4FD" />
+                <stop offset="0.993" stopColor="#D9E0F0" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+      </section>
+      {/* ====== About Section End  */}
+
+      {/* ====== Services Section Start */}
+      <section id="services" className="bg-white pt-20 lg:pt-[120px] pb-12 lg:pb-[90px]">
+        <div className="w-full mx-auto text-center">
+          <h2 className="font-bold text-black text-3xl sm:text-4xl md:text-[45px] mb-5">Residential Services</h2>
+        </div>
+        <div className="w-full mx-auto bg-white rounded-lg shadow">
+          <div className="flex md:flex-row">
+            <div className="container">
+              <ul className="flex flex-col" id="vertical-tabs-tab" role="tablist">
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-3 font-medium text-sm text-blue-600 border-blue-600 hover:font-bold active-tab-style"
+                    id="tab-residential"
+                    data-tab-target="#content-residential"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-residential"
+                    aria-selected="true"
+                  >
+                    Basic Clean
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-3 border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-movein"
+                    data-tab-target="#content-movein"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-security"
+                    aria-selected="false"
+                  >
+                    Deep Clean
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-3 border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-postconstruction"
+                    data-tab-target="#content-postconstruction"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-postconstruction"
+                    aria-selected="false"
+                  >
+                    Move In/Move Out
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-3 border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-rentalproperty"
+                    data-tab-target="#content-rentalproperty"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-rentalproperty"
+                    aria-selected="false"
+                  >
+                    One-Time Cleaning
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-3 border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-linenservices"
+                    data-tab-target="#content-linenservices"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-linenservices"
+                    aria-selected="false"
+                  >
+                    Custom Cleaning
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div id="vertical-tabs-content" className="flex-grow p-3 md:pt-0 tab-content-container">
+              <div
+                className="tab-content-vertical"
+                id="content-residential"
+                role="tabpanel"
+                aria-labelledby="tab-residential"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/0.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Bathrooms, floors, tops of furniture, and trash—perfect for regular upkeep.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-content-vertical hidden"
+                id="content-movein"
+                role="tabpanel"
+                aria-labelledby="tab-movein"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/1.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Includes everything in Basic, plus trim, blinds, windows, and furniture edges. Ideal for seasonal resets or special occasions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-content-vertical hidden"
+                id="content-postconstruction"
+                role="tabpanel"
+                aria-labelledby="tab-postconstruction"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/2.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      A full deep clean to prepare your home for new beginnings—whether you're arriving or leaving.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-content-vertical hidden"
+                id="content-rentalproperty"
+                role="tabpanel"
+                aria-labelledby="tab-rentalproperty"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/3.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      No strings attached. Just a single, thorough clean when you need it most.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-content-vertical hidden"
+                id="content-linenservices"
+                role="tabpanel"
+                aria-labelledby="tab-linenservices"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/4.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Have something unique in mind? Let’s talk. We’ll build a plan and estimate just for you.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+      <section id="services" className="bg-white pt-20 lg:pt-[120px] pb-12 lg:pb-[90px]">
+        <div className="w-full mx-auto text-center">
+          <h2 className="font-bold text-black text-3xl sm:text-4xl md:text-[45px] mb-5">Commercial Services</h2>
+        </div>
+        <div className="w-full mx-auto bg-white rounded-lg shadow">
+          <div className="flex md:flex-row">
+            <div className="container ">
+              <ul className="flex flex-col" id="vertical-tabs-tab" role="tablist">
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-4   font-medium text-sm text-blue-600 border-blue-600 hover:font-bold active-tab-style"
+                    id="tab-comm-residential"
+                    data-tab-target="#content-comm-residential"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-comm-residential"
+                    aria-selected="true"
+                  >
+                    Basic Clean
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-4  border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-comm-movein"
+                    data-tab-target="#content-comm-movein"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-comm-security"
+                    aria-selected="false"
+                  >
+                    Deep Clean
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-4  border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-comm-postconstruction"
+                    data-tab-target="#content-comm-postconstruction"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-comm-postconstruction"
+                    aria-selected="false"
+                  >
+                    Move In/Move Out
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-4  border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-comm-rentalproperty"
+                    data-tab-target="#content-comm-rentalproperty"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-comm-rentalproperty"
+                    aria-selected="false"
+                  >
+                    One-Time Cleaning
+                  </button>
+                </li>
+                <li role="presentation">
+                  <button
+                    className="tab-button-vertical inline-block w-full text-left p-4 border-transparent text-gray-500 hover:text-gray-700 hover:font-bold"
+                    id="tab-comm-linenservices"
+                    data-tab-target="#content-comm-linenservices"
+                    type="button"
+                    role="tab"
+                    aria-controls="content-comm-linenservices"
+                    aria-selected="false"
+                  >
+                    Custom Cleaning
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div id="vertical-tabs-content-comm" className="flex-grow p-4 md:pt-0 tab-content-container">
+              {/* Basic Clean*/}
+              <div
+                className="tab-content-vertical"
+                id="content-comm-residential"
+                role="tabpanel"
+                aria-labelledby="tab-residential"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/0.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Restrooms, floors, surfaces, and trash—ideal for daily or weekly maintenance.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* Deep Clean*/}
+              <div
+                className="tab-content-vertical hidden"
+                id="content-comm-movein"
+                role="tabpanel"
+                aria-labelledby="tab-movein"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/1.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Includes all Basic services, plus trim, blinds, windows, and furniture edges—great for quarterly or seasonal refreshes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* Move In/Move Out Clean*/}
+              <div
+                className="tab-content-vertical hidden"
+                id="content-comm-postconstruction"
+                role="tabpanel"
+                aria-labelledby="tab-postconstruction"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/2.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Preparing or closing a commercial space? We’ll handle the full deep clean to ensure a smooth transition.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/*One-Time Cleaning*/}
+              <div
+                className="tab-content-vertical hidden"
+                id="content-comm-rentalproperty"
+                role="tabpanel"
+                aria-labelledby="tab-rentalproperty"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/3.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Hosting an event or recovering from one? We’ll get your space back to business-ready.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-content-vertical hidden"
+                id="content-comm-linenservices"
+                role="tabpanel"
+                aria-labelledby="tab-linenservices"
+              >
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <img className="w-full" src="/images/services/4.png" alt="Sunset in the mountains" />
+                  <div className="px-6 py-4 bg-black">
+                    <p className="text-white bg-black text-base">
+                      Need something specific? We’ll provide a tailored estimate and plan that fits your business.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+      {/* ====== Clients Section Start  */}
+      <section id="clients" className="pt-20 pb-[250px] bg-black relative">
+        <div className="container">
+          <div className="flex flex-wrap mx-[-16px]">
+            <div className="w-full px-4">
+              <div className="max-w-[570px] mx-auto mb-12 text-center">
+                <h2 className="font-bold text-3xl md:text-4xl text-white mb-4">Some of Our Happy Clients</h2>
+                <p className="font-medium text-lg text-body-color">There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form.</p>
+              </div>
+            </div>
+            <div className="w-full px-4">
+              <div
+                className="flex flex-wrap items-center justify-center wow fadeInUp"
+                data-wow-delay=".1s
+              "
+              >
+                <a
+                  href="https://uideck.com"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="flex items-center justify-center max-w-[120px] lg:max-w-[130px] xl:max-w-[150px] 2xl:max-w-[160px] mx-3 sm:mx-4 xl:mx-6 2xl:mx-8 py-[15px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition"
+                >
+                  <img src="/images/brands/uideck.svg" alt="uideck" />
+                </a>
+                <a
+                  href="https://tailgrids.com"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="flex items-center justify-center max-w-[120px] lg:max-w-[130px] xl:max-w-[150px] 2xl:max-w-[160px] mx-3 sm:mx-4 xl:mx-6 2xl:mx-8 py-[15px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition"
+                >
+                  <img src="/images/brands/tailgrids.svg" alt="tailgrids" />
+                </a>
+                <a
+                  href="https://lineicons.com"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="flex items-center justify-center max-w-[120px] lg:max-w-[130px] xl:max-w-[150px] 2xl:max-w-[160px] mx-3 sm:mx-4 xl:mx-6 2xl:mx-8 py-[15px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition"
+                >
+                  <img src="/images/brands/lineicons.svg" alt="lineicons" />
+                </a>
+                <a
+                  href="https://ayroui.com"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="flex items-center justify-center max-w-[120px] lg:max-w-[130px] xl:max-w-[150px] 2xl:max-w-[160px] mx-3 sm:mx-4 xl:mx-6 2xl:mx-8 py-[15px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition"
+                >
+                  <img src="/images/brands/ayroui.svg" alt="ayroui" />
+                </a>
+                <a
+                  href="https://plainadmin.com"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="flex items-center justify-center max-w-[120px] lg:max-w-[130px] xl:max-w-[150px] 2xl:max-w-[160px] mx-3 sm:mx-4 xl:mx-6 2xl:mx-8 py-[15px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition"
+                >
+                  <img src="/images/brands/plainadmin.svg" alt="plainadmin" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ====== Clients Section End  */}
+
+      {/* ====== CTA Section Start  */}
+      <section className="mt-[-160px]">
+        <div className="container">
+          <div className="bg-primary rounded-md relative overflow-hidden z-10 text-center py-[70px]">
+            <div className="max-w-[770px] mx-auto px-6 relative z-10">
+              <h2 className="font-bold text-white text-2xl md:text-[40px] leading-tight mb-10">Do you want your place clean?</h2>
+              <form className="relative max-w-[480px] mx-auto">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full rounded-full border border-white/[13%] bg-white/[15%] px-8 py-4 text-white placeholder-white/70 outline-none focus-visible:shadow-none focus:border-white transition text-center sm:text-left mb-5 sm:mb-0"
+                />
+                <button className="bg-white text-primary rounded-full font-semibold text-base py-4 sm:py-[10px] px-5 w-full sm:w-auto sm:absolute right-2 top-2">Get a Quote</button>
+              </form>
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 w-full -z-1">
+              <svg width="818" height="286" viewBox="0 0 818 286" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+                <circle cx="409" cy="409" r="408.5" stroke="url(#paint0_linear_0:1)" />
+                <circle cx="409" cy="409" r="349.5" stroke="url(#paint1_linear_0:1)" />
+                <defs>
+                  <linearGradient id="paint0_linear_0:1" x1="-34.5" y1="291.5" x2="851" y2="291.5" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="white" stopOpacity="0.35" />
+                    <stop offset="0.218415" stopColor="white" stopOpacity="0" />
+                    <stop offset="0.728079" stopColor="white" stopOpacity="0" />
+                    <stop offset="1" stopColor="white" stopOpacity="0.35" />
+                  </linearGradient>
+                  <linearGradient id="paint1_linear_0:1" x1="29.4768" y1="308.45" x2="787.24" y2="308.45" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="white" stopOpacity="0.35" />
+                    <stop offset="0.218415" stopColor="white" stopOpacity="0" />
+                    <stop offset="0.777261" stopColor="white" stopOpacity="0" />
+                    <stop offset="1" stopColor="white" stopOpacity="0.35" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ====== CTA Section End  */}
+      {/* ====== Pricing Section Start */}
+      <section id="pricing" className="bg-white pt-20 lg:pt-[120px] relative z-20 overflow-hidden">
+        <div className="container">
+          <div className="flex flex-wrap -mx-4">
+            <div className="w-full px-4">
+              <div className="text-center mx-auto mb-[60px] lg:mb-20 max-w-[510px]">
+                <span className="font-semibold text-lg text-primary mb-2 block"> PRICING </span>
+                <h2 className="font-bold text-3xl sm:text-4xl md:text-[40px] text-dark mb-4">Our Pricing Plan</h2>
+                <p className="text-base text-body-color">There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center -mx-4">
+            <div className="w-full md:w-1/2 lg:w-1/3 px-4">
+              <div className="bg-white rounded-xl relative z-10 overflow-hidden border border-primary/20 shadow-pricing py-10 px-8 sm:p-12 lg:py-10 lg:px-6 xl:px-10 2xl:p-12 mb-10">
+                <span className="text-primary font-semibold text-lg block mb-4"> Personal </span>
+                <h2 className="font-bold text-dark mb-5 text-[42px]">
+                  $59
+                  <span className="text-base text-body-color font-medium"> / year </span>
+                </h2>
+                <p className="text-base text-body-color pb-8 mb-8 border-b border-[#F2F2F2]">Perfect for using in a personal website or a client project.</p>
+                <div className="mb-7">
+                  <p className="text-base text-body-color leading-loose mb-1">1 User</p>
+                  <p className="text-base text-body-color leading-loose mb-1">All UI components</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Lifetime access</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Free updates</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Use on 1 (one) project</p>
+                  <p className="text-base text-body-color leading-loose mb-1">3 Months support</p>
+                </div>
+                <a
+                  href="javascript:void(0)"
+                  className="w-full block text-base font-semibold text-primary bg-transparent border border-[#D4DEFF] rounded-md text-center p-4 hover:text-white hover:bg-primary hover:border-primary transition"
+                >
+                  Choose Personal
+                </a>
+
+                <div>
+                  <span className="absolute right-0 top-7 z-[-1]">
+                    <svg width="77" height="172" viewBox="0 0 77 172" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="86" cy="86" r="86" fill="url(#paint0_linear)" />
+                      <defs>
+                        <linearGradient id="paint0_linear" x1="86" y1="0" x2="86" y2="172" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#3056D3" stopOpacity="0.09" />
+                          <stop offset="1" stopColor="#C4C4C4" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </span>
+                  <span className="absolute right-4 top-4 z-[-1]">
+                    <svg width="41" height="89" viewBox="0 0 41 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="38.9138" cy="87.4849" r="1.42021" transform="rotate(180 38.9138 87.4849)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="74.9871" r="1.42021" transform="rotate(180 38.9138 74.9871)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="62.4892" r="1.42021" transform="rotate(180 38.9138 62.4892)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="38.3457" r="1.42021" transform="rotate(180 38.9138 38.3457)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="13.634" r="1.42021" transform="rotate(180 38.9138 13.634)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="50.2754" r="1.42021" transform="rotate(180 38.9138 50.2754)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="26.1319" r="1.42021" transform="rotate(180 38.9138 26.1319)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="1.42021" r="1.42021" transform="rotate(180 38.9138 1.42021)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="87.4849" r="1.42021" transform="rotate(180 26.4157 87.4849)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="74.9871" r="1.42021" transform="rotate(180 26.4157 74.9871)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="62.4892" r="1.42021" transform="rotate(180 26.4157 62.4892)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="38.3457" r="1.42021" transform="rotate(180 26.4157 38.3457)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="13.634" r="1.42021" transform="rotate(180 26.4157 13.634)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="50.2754" r="1.42021" transform="rotate(180 26.4157 50.2754)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="26.1319" r="1.42021" transform="rotate(180 26.4157 26.1319)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="1.4202" r="1.42021" transform="rotate(180 26.4157 1.4202)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="87.4849" r="1.42021" transform="rotate(180 13.9177 87.4849)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="74.9871" r="1.42021" transform="rotate(180 13.9177 74.9871)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="62.4892" r="1.42021" transform="rotate(180 13.9177 62.4892)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="38.3457" r="1.42021" transform="rotate(180 13.9177 38.3457)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="13.634" r="1.42021" transform="rotate(180 13.9177 13.634)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="50.2754" r="1.42021" transform="rotate(180 13.9177 50.2754)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="26.1319" r="1.42021" transform="rotate(180 13.9177 26.1319)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="1.42019" r="1.42021" transform="rotate(180 13.9177 1.42019)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="87.4849" r="1.42021" transform="rotate(180 1.41963 87.4849)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="74.9871" r="1.42021" transform="rotate(180 1.41963 74.9871)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="62.4892" r="1.42021" transform="rotate(180 1.41963 62.4892)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="38.3457" r="1.42021" transform="rotate(180 1.41963 38.3457)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="13.634" r="1.42021" transform="rotate(180 1.41963 13.634)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="50.2754" r="1.42021" transform="rotate(180 1.41963 50.2754)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="26.1319" r="1.42021" transform="rotate(180 1.41963 26.1319)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="1.4202" r="1.42021" transform="rotate(180 1.41963 1.4202)" fill="#3056D3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 lg:w-1/3 px-4">
+              <div className="bg-white rounded-xl relative z-10 overflow-hidden border border-primary border-opacity-20 shadow-pricing py-10 px-8 sm:p-12 lg:py-10 lg:px-6 xl:px-10 2xl:p-12 mb-10">
+                <span className="text-primary font-semibold text-lg block mb-4"> Business </span>
+                <h2 className="font-bold text-dark mb-5 text-[42px]">
+                  $199
+                  <span className="text-base text-body-color font-medium"> / year </span>
+                </h2>
+                <p className="text-base text-body-color pb-8 mb-8 border-b border-[#F2F2F2]">Perfect for using in a Business website or a client project.</p>
+                <div className="mb-7">
+                  <p className="text-base text-body-color leading-loose mb-1">5 Users</p>
+                  <p className="text-base text-body-color leading-loose mb-1">All UI components</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Lifetime access</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Free updates</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Use on 3 (Three) project</p>
+                  <p className="text-base text-body-color leading-loose mb-1">4 Months support</p>
+                </div>
+                <a href="javascript:void(0)" className="w-full block text-base font-semibold text-white bg-primary border border-primary rounded-md text-center p-4 hover:bg-opacity-90 transition">
+                  Choose Business
+                </a>
+
+                <div>
+                  <span className="absolute right-0 top-7 z-[-1]">
+                    <svg width="77" height="172" viewBox="0 0 77 172" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="86" cy="86" r="86" fill="url(#paint0_linear)" />
+                      <defs>
+                        <linearGradient id="paint0_linear" x1="86" y1="0" x2="86" y2="172" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#3056D3" stopOpacity="0.09" />
+                          <stop offset="1" stopColor="#C4C4C4" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </span>
+                  <span className="absolute right-4 top-4 z-[-1]">
+                    <svg width="41" height="89" viewBox="0 0 41 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="38.9138" cy="87.4849" r="1.42021" transform="rotate(180 38.9138 87.4849)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="74.9871" r="1.42021" transform="rotate(180 38.9138 74.9871)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="62.4892" r="1.42021" transform="rotate(180 38.9138 62.4892)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="38.3457" r="1.42021" transform="rotate(180 38.9138 38.3457)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="13.634" r="1.42021" transform="rotate(180 38.9138 13.634)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="50.2754" r="1.42021" transform="rotate(180 38.9138 50.2754)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="26.1319" r="1.42021" transform="rotate(180 38.9138 26.1319)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="1.42021" r="1.42021" transform="rotate(180 38.9138 1.42021)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="87.4849" r="1.42021" transform="rotate(180 26.4157 87.4849)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="74.9871" r="1.42021" transform="rotate(180 26.4157 74.9871)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="62.4892" r="1.42021" transform="rotate(180 26.4157 62.4892)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="38.3457" r="1.42021" transform="rotate(180 26.4157 38.3457)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="13.634" r="1.42021" transform="rotate(180 26.4157 13.634)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="50.2754" r="1.42021" transform="rotate(180 26.4157 50.2754)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="26.1319" r="1.42021" transform="rotate(180 26.4157 26.1319)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="1.4202" r="1.42021" transform="rotate(180 26.4157 1.4202)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="87.4849" r="1.42021" transform="rotate(180 13.9177 87.4849)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="74.9871" r="1.42021" transform="rotate(180 13.9177 74.9871)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="62.4892" r="1.42021" transform="rotate(180 13.9177 62.4892)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="38.3457" r="1.42021" transform="rotate(180 13.9177 38.3457)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="13.634" r="1.42021" transform="rotate(180 13.9177 13.634)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="50.2754" r="1.42021" transform="rotate(180 13.9177 50.2754)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="26.1319" r="1.42021" transform="rotate(180 13.9177 26.1319)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="1.42019" r="1.42021" transform="rotate(180 13.9177 1.42019)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="87.4849" r="1.42021" transform="rotate(180 1.41963 87.4849)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="74.9871" r="1.42021" transform="rotate(180 1.41963 74.9871)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="62.4892" r="1.42021" transform="rotate(180 1.41963 62.4892)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="38.3457" r="1.42021" transform="rotate(180 1.41963 38.3457)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="13.634" r="1.42021" transform="rotate(180 1.41963 13.634)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="50.2754" r="1.42021" transform="rotate(180 1.41963 50.2754)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="26.1319" r="1.42021" transform="rotate(180 1.41963 26.1319)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="1.4202" r="1.42021" transform="rotate(180 1.41963 1.4202)" fill="#3056D3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 lg:w-1/3 px-4">
+              <div className="bg-white rounded-xl relative z-10 overflow-hidden border border-primary border-opacity-20 shadow-pricing py-10 px-8 sm:p-12 lg:py-10 lg:px-6 xl:px-10 2xl:p-12 mb-10">
+                <span className="text-primary font-semibold text-lg block mb-4"> Professional </span>
+                <h2 className="font-bold text-dark mb-5 text-[42px]">
+                  $256
+                  <span className="text-base text-body-color font-medium"> / year </span>
+                </h2>
+                <p className="text-base text-body-color pb-8 mb-8 border-b border-[#F2F2F2]">Perfect for using in a Professional website or a client project.</p>
+                <div className="mb-7">
+                  <p className="text-base text-body-color leading-loose mb-1">Unlimited Users</p>
+                  <p className="text-base text-body-color leading-loose mb-1">All UI components</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Lifetime access</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Free updates</p>
+                  <p className="text-base text-body-color leading-loose mb-1">Use on Unlimited project</p>
+                  <p className="text-base text-body-color leading-loose mb-1">12 Months support</p>
+                </div>
+                <a
+                  href="javascript:void(0)"
+                  className="w-full block text-base font-semibold text-primary bg-transparent border border-[#D4DEFF] rounded-md text-center p-4 hover:text-white hover:bg-primary hover:border-primary transition"
+                >
+                  Choose Professional
+                </a>
+
+                <div>
+                  <span className="absolute right-0 top-7 z-[-1]">
+                    <svg width="77" height="172" viewBox="0 0 77 172" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="86" cy="86" r="86" fill="url(#paint0_linear)" />
+                      <defs>
+                        <linearGradient id="paint0_linear" x1="86" y1="0" x2="86" y2="172" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#3056D3" stopOpacity="0.09" />
+                          <stop offset="1" stopColor="#C4C4C4" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </span>
+                  <span className="absolute right-4 top-4 z-[-1]">
+                    <svg width="41" height="89" viewBox="0 0 41 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="38.9138" cy="87.4849" r="1.42021" transform="rotate(180 38.9138 87.4849)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="74.9871" r="1.42021" transform="rotate(180 38.9138 74.9871)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="62.4892" r="1.42021" transform="rotate(180 38.9138 62.4892)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="38.3457" r="1.42021" transform="rotate(180 38.9138 38.3457)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="13.634" r="1.42021" transform="rotate(180 38.9138 13.634)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="50.2754" r="1.42021" transform="rotate(180 38.9138 50.2754)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="26.1319" r="1.42021" transform="rotate(180 38.9138 26.1319)" fill="#3056D3" />
+                      <circle cx="38.9138" cy="1.42021" r="1.42021" transform="rotate(180 38.9138 1.42021)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="87.4849" r="1.42021" transform="rotate(180 26.4157 87.4849)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="74.9871" r="1.42021" transform="rotate(180 26.4157 74.9871)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="62.4892" r="1.42021" transform="rotate(180 26.4157 62.4892)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="38.3457" r="1.42021" transform="rotate(180 26.4157 38.3457)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="13.634" r="1.42021" transform="rotate(180 26.4157 13.634)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="50.2754" r="1.42021" transform="rotate(180 26.4157 50.2754)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="26.1319" r="1.42021" transform="rotate(180 26.4157 26.1319)" fill="#3056D3" />
+                      <circle cx="26.4157" cy="1.4202" r="1.42021" transform="rotate(180 26.4157 1.4202)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="87.4849" r="1.42021" transform="rotate(180 13.9177 87.4849)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="74.9871" r="1.42021" transform="rotate(180 13.9177 74.9871)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="62.4892" r="1.42021" transform="rotate(180 13.9177 62.4892)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="38.3457" r="1.42021" transform="rotate(180 13.9177 38.3457)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="13.634" r="1.42021" transform="rotate(180 13.9177 13.634)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="50.2754" r="1.42021" transform="rotate(180 13.9177 50.2754)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="26.1319" r="1.42021" transform="rotate(180 13.9177 26.1319)" fill="#3056D3" />
+                      <circle cx="13.9177" cy="1.42019" r="1.42021" transform="rotate(180 13.9177 1.42019)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="87.4849" r="1.42021" transform="rotate(180 1.41963 87.4849)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="74.9871" r="1.42021" transform="rotate(180 1.41963 74.9871)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="62.4892" r="1.42021" transform="rotate(180 1.41963 62.4892)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="38.3457" r="1.42021" transform="rotate(180 1.41963 38.3457)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="13.634" r="1.42021" transform="rotate(180 1.41963 13.634)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="50.2754" r="1.42021" transform="rotate(180 1.41963 50.2754)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="26.1319" r="1.42021" transform="rotate(180 1.41963 26.1319)" fill="#3056D3" />
+                      <circle cx="1.41963" cy="1.4202" r="1.42021" transform="rotate(180 1.41963 1.4202)" fill="#3056D3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ====== Pricing Section End */}
+
+      {/* ====== Testimonial Section Start  */}
+      <section id="testimonial" className="pt-[120px] pb-20">
+        <div className="container">
+          <div className="flex flex-wrap mx-[-16px]">
+            <div className="w-full px-4">
+              <div className="max-w-[600px] mx-auto text-center mb-[50px]">
+                <span className="font-semibold text-lg text-primary block mb-2"> TESTIMONIALS </span>
+                <h2 className="font-bold text-black text-3xl sm:text-4xl md:text-[45px] mb-5">Hear From Our Clients</h2>
+                <p className="font-medium text-lg text-body-color">There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap -mx-4">
+            <div className="w-full lg:w-1/2 px-4">
+              <div className="bg-white rounded-xl relative overflow-hidden px-7 sm:px-10 p-10 shadow-testimonial mb-10">
+                <div className="mb-5">
+                  <img src="/images/testimonial/lineicon.svg" alt="lineicons" className="h-5" />
+                </div>
+                <p className="font-medium text-lg text-body-color mb-8">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet tempus augue, ac venenatis lectus tempus ut. Sed sodales erat a libero.
+                </p>
+                <div className="flex items-center">
+                  <div className="max-w-[60px] w-full h-[60px] rounded-full overflow-hidden mr-3">
+                    <img src="/images/testimonial/image-1.png" alt="image" className="w-full" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base text-black mb-1">Musharof Chy</h3>
+                    <p className="text-sm text-body-color">Founder @ LineIcons</p>
+                  </div>
+                </div>
+                <div className="absolute bottom-8 right-8">
+                  <svg width="51" height="29" viewBox="0 0 51 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.15">
+                      <path
+                        d="M12.4311 0.00142075C7.14984 -0.0798293 2.35609 3.33267 1.21859 7.96392C0.568593 10.8077 1.13734 13.6514 2.84359 15.9264C4.63109 18.3639 7.39359 19.9077 10.4811 20.3139L13.3248 27.3014C13.6498 28.0327 14.3811 28.5202 15.1936 28.5202C16.0061 28.5202 16.7373 28.0327 17.0623 27.3014C17.5498 26.0827 18.1186 24.7827 18.6873 23.5639C20.0686 20.4764 21.4498 17.3077 22.5061 14.0577C23.6436 10.6452 23.1561 6.98892 21.2061 4.22642C19.2561 1.54517 16.1686 0.0826707 12.4311 0.00142075ZM19.8248 13.2452C18.7686 16.3327 17.3873 19.5014 16.0873 22.5077C15.8436 23.1577 15.5186 23.7264 15.2748 24.3764L12.5123 17.7139L11.6186 17.6327C9.01859 17.4702 6.58109 16.1702 5.19984 14.3014C3.98109 12.6764 3.57484 10.6452 4.06234 8.69517C4.87484 5.36392 8.36859 2.92642 12.3498 2.92642H12.4311C15.1936 2.92642 17.4686 4.06392 18.9311 6.01392C20.3123 7.96392 20.6373 10.7264 19.8248 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                      <path
+                        d="M49.0747 4.30772C47.1247 1.54522 44.0372 0.00146484 40.2997 0.00146484C40.2185 0.00146484 40.2185 0.00146484 40.1372 0.00146484C34.9372 0.00146484 30.2247 3.41397 29.0872 7.96397C28.4372 10.8077 29.006 13.6515 30.7122 16.0077C32.4997 18.4452 35.2622 19.989 38.3497 20.3952L41.1935 27.3827C41.5185 28.114 42.2497 28.6015 43.0622 28.6015C43.8747 28.6015 44.606 28.114 44.931 27.3827C45.4185 26.164 45.9872 24.864 46.556 23.6452C47.9372 20.5577 49.3185 17.389 50.3747 14.139C51.5122 10.8077 51.0247 7.07022 49.0747 4.30772ZM47.6935 13.2452C46.6372 16.3327 45.256 19.5015 43.956 22.5077C43.7122 23.1577 43.3872 23.7265 43.1435 24.3765L40.381 17.714L39.4872 17.6327C36.8872 17.4702 34.4497 16.1702 33.0685 14.3015C31.8497 12.6765 31.4435 10.6452 31.931 8.61397C32.7435 5.28272 36.2372 2.84521 40.2185 2.84521H40.2997C43.0622 2.84521 45.3372 3.98272 46.7997 5.93272C48.181 7.96397 48.506 10.7265 47.6935 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/2 px-4">
+              <div className="bg-white rounded-xl relative overflow-hidden px-7 sm:px-10 p-10 shadow-testimonial mb-10">
+                <div className="mb-5">
+                  <img src="/images/testimonial/tailgrid.svg" alt="tailgrids" className="h-7" />
+                </div>
+                <p className="font-medium text-lg text-body-color mb-8">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet tempus augue, ac venenatis lectus tempus ut. Sed sodales erat a libero.
+                </p>
+                <div className="flex items-center">
+                  <div className="max-w-[60px] w-full h-[60px] rounded-full overflow-hidden mr-3">
+                    <img src="/images/testimonial/image-2.png" alt="image" className="w-full" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base text-black mb-1">Devid Sailio</h3>
+                    <p className="text-sm text-body-color">Founder @ TailGrids</p>
+                  </div>
+                </div>
+                <div className="absolute bottom-8 right-8">
+                  <svg width="51" height="29" viewBox="0 0 51 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.15">
+                      <path
+                        d="M12.4311 0.00142075C7.14984 -0.0798293 2.35609 3.33267 1.21859 7.96392C0.568593 10.8077 1.13734 13.6514 2.84359 15.9264C4.63109 18.3639 7.39359 19.9077 10.4811 20.3139L13.3248 27.3014C13.6498 28.0327 14.3811 28.5202 15.1936 28.5202C16.0061 28.5202 16.7373 28.0327 17.0623 27.3014C17.5498 26.0827 18.1186 24.7827 18.6873 23.5639C20.0686 20.4764 21.4498 17.3077 22.5061 14.0577C23.6436 10.6452 23.1561 6.98892 21.2061 4.22642C19.2561 1.54517 16.1686 0.0826707 12.4311 0.00142075ZM19.8248 13.2452C18.7686 16.3327 17.3873 19.5014 16.0873 22.5077C15.8436 23.1577 15.5186 23.7264 15.2748 24.3764L12.5123 17.7139L11.6186 17.6327C9.01859 17.4702 6.58109 16.1702 5.19984 14.3014C3.98109 12.6764 3.57484 10.6452 4.06234 8.69517C4.87484 5.36392 8.36859 2.92642 12.3498 2.92642H12.4311C15.1936 2.92642 17.4686 4.06392 18.9311 6.01392C20.3123 7.96392 20.6373 10.7264 19.8248 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                      <path
+                        d="M49.0747 4.30772C47.1247 1.54522 44.0372 0.00146484 40.2997 0.00146484C40.2185 0.00146484 40.2185 0.00146484 40.1372 0.00146484C34.9372 0.00146484 30.2247 3.41397 29.0872 7.96397C28.4372 10.8077 29.006 13.6515 30.7122 16.0077C32.4997 18.4452 35.2622 19.989 38.3497 20.3952L41.1935 27.3827C41.5185 28.114 42.2497 28.6015 43.0622 28.6015C43.8747 28.6015 44.606 28.114 44.931 27.3827C45.4185 26.164 45.9872 24.864 46.556 23.6452C47.9372 20.5577 49.3185 17.389 50.3747 14.139C51.5122 10.8077 51.0247 7.07022 49.0747 4.30772ZM47.6935 13.2452C46.6372 16.3327 45.256 19.5015 43.956 22.5077C43.7122 23.1577 43.3872 23.7265 43.1435 24.3765L40.381 17.714L39.4872 17.6327C36.8872 17.4702 34.4497 16.1702 33.0685 14.3015C31.8497 12.6765 31.4435 10.6452 31.931 8.61397C32.7435 5.28272 36.2372 2.84521 40.2185 2.84521H40.2997C43.0622 2.84521 45.3372 3.98272 46.7997 5.93272C48.181 7.96397 48.506 10.7265 47.6935 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/2 px-4">
+              <div className="bg-white rounded-xl relative overflow-hidden px-7 sm:px-10 p-10 shadow-testimonial mb-10">
+                <div className="mb-5">
+                  <img src="/images/testimonial/ayro.svg" alt="ayroui" className="h-7" />
+                </div>
+                <p className="font-medium text-lg text-body-color mb-8">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet tempus augue, ac venenatis lectus tempus ut. Sed sodales erat a libero.
+                </p>
+                <div className="flex items-center">
+                  <div className="max-w-[60px] w-full h-[60px] rounded-full overflow-hidden mr-3">
+                    <img src="/images/testimonial/image-3.png" alt="image" className="w-full" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base text-black mb-1">Jenifer Lofeez</h3>
+                    <p className="text-sm text-body-color">Founder @ Ayro UI</p>
+                  </div>
+                </div>
+                <div className="absolute bottom-8 right-8">
+                  <svg width="51" height="29" viewBox="0 0 51 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.15">
+                      <path
+                        d="M12.4311 0.00142075C7.14984 -0.0798293 2.35609 3.33267 1.21859 7.96392C0.568593 10.8077 1.13734 13.6514 2.84359 15.9264C4.63109 18.3639 7.39359 19.9077 10.4811 20.3139L13.3248 27.3014C13.6498 28.0327 14.3811 28.5202 15.1936 28.5202C16.0061 28.5202 16.7373 28.0327 17.0623 27.3014C17.5498 26.0827 18.1186 24.7827 18.6873 23.5639C20.0686 20.4764 21.4498 17.3077 22.5061 14.0577C23.6436 10.6452 23.1561 6.98892 21.2061 4.22642C19.2561 1.54517 16.1686 0.0826707 12.4311 0.00142075ZM19.8248 13.2452C18.7686 16.3327 17.3873 19.5014 16.0873 22.5077C15.8436 23.1577 15.5186 23.7264 15.2748 24.3764L12.5123 17.7139L11.6186 17.6327C9.01859 17.4702 6.58109 16.1702 5.19984 14.3014C3.98109 12.6764 3.57484 10.6452 4.06234 8.69517C4.87484 5.36392 8.36859 2.92642 12.3498 2.92642H12.4311C15.1936 2.92642 17.4686 4.06392 18.9311 6.01392C20.3123 7.96392 20.6373 10.7264 19.8248 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                      <path
+                        d="M49.0747 4.30772C47.1247 1.54522 44.0372 0.00146484 40.2997 0.00146484C40.2185 0.00146484 40.2185 0.00146484 40.1372 0.00146484C34.9372 0.00146484 30.2247 3.41397 29.0872 7.96397C28.4372 10.8077 29.006 13.6515 30.7122 16.0077C32.4997 18.4452 35.2622 19.989 38.3497 20.3952L41.1935 27.3827C41.5185 28.114 42.2497 28.6015 43.0622 28.6015C43.8747 28.6015 44.606 28.114 44.931 27.3827C45.4185 26.164 45.9872 24.864 46.556 23.6452C47.9372 20.5577 49.3185 17.389 50.3747 14.139C51.5122 10.8077 51.0247 7.07022 49.0747 4.30772ZM47.6935 13.2452C46.6372 16.3327 45.256 19.5015 43.956 22.5077C43.7122 23.1577 43.3872 23.7265 43.1435 24.3765L40.381 17.714L39.4872 17.6327C36.8872 17.4702 34.4497 16.1702 33.0685 14.3015C31.8497 12.6765 31.4435 10.6452 31.931 8.61397C32.7435 5.28272 36.2372 2.84521 40.2185 2.84521H40.2997C43.0622 2.84521 45.3372 3.98272 46.7997 5.93272C48.181 7.96397 48.506 10.7265 47.6935 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/2 px-4">
+              <div className="bg-white rounded-xl relative overflow-hidden px-7 sm:px-10 p-10 shadow-testimonial mb-10">
+                <div className="mb-5">
+                  <img src="/images/testimonial/uidecks.svg" alt="uideck" className="h-7" />
+                </div>
+                <p className="font-medium text-lg text-body-color mb-8">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet tempus augue, ac venenatis lectus tempus ut. Sed sodales erat a libero.
+                </p>
+                <div className="flex items-center">
+                  <div className="max-w-[60px] w-full h-[60px] rounded-full overflow-hidden mr-3">
+                    <img src="/images/testimonial/image-4.png" alt="image" className="w-full" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base text-black mb-1">Justin Herry</h3>
+                    <p className="text-sm text-body-color">Founder @ UIdeck</p>
+                  </div>
+                </div>
+                <div className="absolute bottom-8 right-8">
+                  <svg width="51" height="29" viewBox="0 0 51 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.15">
+                      <path
+                        d="M12.4311 0.00142075C7.14984 -0.0798293 2.35609 3.33267 1.21859 7.96392C0.568593 10.8077 1.13734 13.6514 2.84359 15.9264C4.63109 18.3639 7.39359 19.9077 10.4811 20.3139L13.3248 27.3014C13.6498 28.0327 14.3811 28.5202 15.1936 28.5202C16.0061 28.5202 16.7373 28.0327 17.0623 27.3014C17.5498 26.0827 18.1186 24.7827 18.6873 23.5639C20.0686 20.4764 21.4498 17.3077 22.5061 14.0577C23.6436 10.6452 23.1561 6.98892 21.2061 4.22642C19.2561 1.54517 16.1686 0.0826707 12.4311 0.00142075ZM19.8248 13.2452C18.7686 16.3327 17.3873 19.5014 16.0873 22.5077C15.8436 23.1577 15.5186 23.7264 15.2748 24.3764L12.5123 17.7139L11.6186 17.6327C9.01859 17.4702 6.58109 16.1702 5.19984 14.3014C3.98109 12.6764 3.57484 10.6452 4.06234 8.69517C4.87484 5.36392 8.36859 2.92642 12.3498 2.92642H12.4311C15.1936 2.92642 17.4686 4.06392 18.9311 6.01392C20.3123 7.96392 20.6373 10.7264 19.8248 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                      <path
+                        d="M49.0747 4.30772C47.1247 1.54522 44.0372 0.00146484 40.2997 0.00146484C40.2185 0.00146484 40.2185 0.00146484 40.1372 0.00146484C34.9372 0.00146484 30.2247 3.41397 29.0872 7.96397C28.4372 10.8077 29.006 13.6515 30.7122 16.0077C32.4997 18.4452 35.2622 19.989 38.3497 20.3952L41.1935 27.3827C41.5185 28.114 42.2497 28.6015 43.0622 28.6015C43.8747 28.6015 44.606 28.114 44.931 27.3827C45.4185 26.164 45.9872 24.864 46.556 23.6452C47.9372 20.5577 49.3185 17.389 50.3747 14.139C51.5122 10.8077 51.0247 7.07022 49.0747 4.30772ZM47.6935 13.2452C46.6372 16.3327 45.256 19.5015 43.956 22.5077C43.7122 23.1577 43.3872 23.7265 43.1435 24.3765L40.381 17.714L39.4872 17.6327C36.8872 17.4702 34.4497 16.1702 33.0685 14.3015C31.8497 12.6765 31.4435 10.6452 31.931 8.61397C32.7435 5.28272 36.2372 2.84521 40.2185 2.84521H40.2997C43.0622 2.84521 45.3372 3.98272 46.7997 5.93272C48.181 7.96397 48.506 10.7265 47.6935 13.2452Z"
+                        fill="#4A6CF7"
+                      />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ====== Contact Section End  */}
+
+      {/* ====== Footer Section Start  */}
+      <footer className="bg-black pt-[100px] pb-12 relative z-10">
+        <div className="container">
+          <div className="flex flex-wrap -mx-4">
+            <div className="w-full md:w-1/2 lg:w-4/12 px-4">
+              <div className="mb-10">
+                <h2 className="font-bold text-white text-[44px] leading-tight mb-5">Let's Talk!</h2>
+                <h3 className="font-bold text-white opacity-70 text-2xl mb-2">Contact Info</h3>
+                <p className="font-medium text-base text-body-color mb-1">closerpage@email.com</p>
+                <p className="font-medium text-base text-body-color mb-1">12 Hilton St, Manchester M1 1JF</p>
+                <p className="font-medium text-base text-body-color mb-1">+44 012 34 5678</p>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 lg:w-3/12 px-4">
+              <div className="mb-10">
+                <h3 className="font-semibold text-white text-xl mb-9">What I Do?</h3>
+                <ul>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> The Studio </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Sponsoring </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Newsletter </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Contact Us </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 lg:w-2/12 px-4">
+              <div className="mb-10">
+                <h3 className="font-semibold text-white text-xl mb-9">News</h3>
+                <ul>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Hot Stuff </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Perfect Place </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Vintage </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Products </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 lg:w-3/12 px-4">
+              <div className="mb-10">
+                <h3 className="font-semibold text-white text-xl mb-9">Quick Links</h3>
+                <ul>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Style </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Health </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Relationship </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" className="inline-block text-base text-body-color mb-3 hover:text-primary"> Legal & Privacy </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 pt-12 border-t border-white border-opacity-10">
+            <div className="flex items-center justify-center mb-5">
+              <a href="javascript:void(0)" className="flex items-center justify-center w-8 h-8 founded-full mx-2 text-body-color hover:text-primary" aria-label="social-link">
+                <svg width="32" height="32" viewBox="0 0 32 32" className="fill-current" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M32 16C32 7.1625 24.8375 0 16 0C7.1625 0 0 7.1625 0 16C0 24.8375 7.1625 32 16 32C16.0938 32 16.1875 32 16.2812 31.9937V19.5438H12.8438V15.5375H16.2812V12.5875C16.2812 9.16875 18.3688 7.30625 21.4188 7.30625C22.8813 7.30625 24.1375 7.4125 24.5 7.4625V11.0375H22.4C20.7437 11.0375 20.4188 11.825 20.4188 12.9812V15.5312H24.3875L23.8687 19.5375H20.4188V31.3813C27.1063 29.4625 32 23.3062 32 16Z"
+                  />
+                </svg>
+              </a>
+              <a href="javascript:void(0)" className="flex items-center justify-center w-8 h-8 founded-full mx-2 text-body-color hover:text-primary" aria-label="social-link">
+                <svg width="32" height="32" viewBox="0 0 32 32" className="fill-current">
+                  <path
+                    d="M19.0625 16C19.0625 17.6914 17.6914 19.0625 16 19.0625C14.3086 19.0625 12.9375 17.6914 12.9375 16C12.9375 14.3086 14.3086 12.9375 16 12.9375C17.6914 12.9375 19.0625 14.3086 19.0625 16Z"
+                  />
+                  <path
+                    d="M23.1621 10.5813C23.0149 10.1824 22.78 9.82129 22.4749 9.5249C22.1785 9.21973 21.8176 8.98486 21.4185 8.83765C21.0947 8.71191 20.6084 8.56226 19.7126 8.52148C18.7437 8.47729 18.4531 8.46777 16 8.46777C13.5466 8.46777 13.2561 8.47705 12.2874 8.52124C11.3916 8.56226 10.905 8.71191 10.5815 8.83765C10.1824 8.98486 9.82129 9.21973 9.52515 9.5249C9.21997 9.82129 8.98511 10.1821 8.83765 10.5813C8.71191 10.905 8.56226 11.3916 8.52148 12.2874C8.47729 13.2561 8.46777 13.5466 8.46777 16C8.46777 18.4531 8.47729 18.7437 8.52148 19.7126C8.56226 20.6084 8.71191 21.0947 8.83765 21.4185C8.98511 21.8176 9.21973 22.1785 9.5249 22.4749C9.82129 22.78 10.1821 23.0149 10.5813 23.1621C10.905 23.2881 11.3916 23.4377 12.2874 23.4785C13.2561 23.5227 13.5464 23.532 15.9998 23.532C18.4534 23.532 18.7439 23.5227 19.7124 23.4785C20.6082 23.4377 21.0947 23.2881 21.4185 23.1621C22.2197 22.853 22.853 22.2197 23.1621 21.4185C23.2878 21.0947 23.4375 20.6084 23.4785 19.7126C23.5227 18.7437 23.532 18.4531 23.532 16C23.532 13.5466 23.5227 13.2561 23.4785 12.2874C23.4377 11.3916 23.2881 10.905 23.1621 10.5813ZM16 20.7175C13.3943 20.7175 11.282 18.6055 11.282 15.9998C11.282 13.394 13.3943 11.282 16 11.282C18.6055 11.282 20.7178 13.394 20.7178 15.9998C20.7178 18.6055 18.6055 20.7175 16 20.7175ZM20.9043 12.198C20.2954 12.198 19.8018 11.7043 19.8018 11.0955C19.8018 10.4866 20.2954 9.99292 20.9043 9.99292C21.5132 9.99292 22.0068 10.4866 22.0068 11.0955C22.0066 11.7043 21.5132 12.198 20.9043 12.198Z"
+                  />
+                  <path
+                    d="M16 0C7.16479 0 0 7.16479 0 16C0 24.8352 7.16479 32 16 32C24.8352 32 32 24.8352 32 16C32 7.16479 24.8352 0 16 0ZM25.1321 19.7878C25.0876 20.7659 24.9321 21.4336 24.7051 22.0181C24.2278 23.2522 23.2522 24.2278 22.0181 24.7051C21.4338 24.9321 20.7659 25.0874 19.7881 25.1321C18.8083 25.1768 18.4954 25.1875 16.0002 25.1875C13.5049 25.1875 13.1921 25.1768 12.2122 25.1321C11.2344 25.0874 10.5664 24.9321 9.98218 24.7051C9.3689 24.4744 8.81372 24.1128 8.35474 23.6453C7.88745 23.1865 7.52588 22.6311 7.29517 22.0181C7.06812 21.4338 6.9126 20.7659 6.86816 19.7881C6.823 18.8081 6.8125 18.4951 6.8125 16C6.8125 13.5049 6.823 13.1919 6.86792 12.2122C6.91235 11.2341 7.06763 10.5664 7.29468 9.98193C7.52539 9.3689 7.88721 8.81348 8.35474 8.35474C8.81348 7.88721 9.3689 7.52563 9.98193 7.29492C10.5664 7.06787 11.2341 6.9126 12.2122 6.86792C13.1919 6.82324 13.5049 6.8125 16 6.8125C18.4951 6.8125 18.8081 6.82324 19.7878 6.86816C20.7659 6.9126 21.4336 7.06787 22.0181 7.29468C22.6311 7.52539 23.1865 7.88721 23.6455 8.35474C24.1128 8.81372 24.4746 9.3689 24.7051 9.98193C24.9324 10.5664 25.0876 11.2341 25.1323 12.2122C25.177 13.1919 25.1875 13.5049 25.1875 16C25.1875 18.4951 25.177 18.8081 25.1321 19.7878Z"
+                  />
+                </svg>
+              </a>
+              <a href="javascript:void(0)" className="flex items-center justify-center w-8 h-8 founded-full mx-2 text-body-color hover:text-primary" aria-label="social-link">
+                <svg width="32" height="32" viewBox="0 0 32 32" className="fill-current">
+                  <path
+                    d="M16 0C7.16479 0 0 7.16479 0 16C0 24.8352 7.16479 32 16 32C24.8352 32 32 24.8352 32 16C32 7.16479 24.8352 0 16 0ZM23.3054 12.4751C23.3125 12.6326 23.3159 12.7908 23.3159 12.9497C23.3159 17.8025 19.6221 23.3984 12.8669 23.3987H12.8672H12.8669C10.793 23.3987 8.86304 22.7908 7.23779 21.749C7.52515 21.783 7.81763 21.7998 8.11377 21.7998C9.83447 21.7998 11.418 21.2129 12.675 20.2278C11.0674 20.198 9.71191 19.1362 9.24414 17.677C9.46802 17.72 9.69824 17.7434 9.93433 17.7434C10.2695 17.7434 10.5942 17.6982 10.9028 17.614C9.22241 17.2776 7.95654 15.7925 7.95654 14.0142C7.95654 13.9976 7.95654 13.9827 7.95703 13.9673C8.4519 14.2424 9.01782 14.408 9.62036 14.4265C8.63428 13.7686 7.98608 12.6438 7.98608 11.3696C7.98608 10.6968 8.16797 10.0664 8.4834 9.52368C10.2944 11.7458 13.001 13.2073 16.0532 13.3608C15.9902 13.0918 15.9578 12.8115 15.9578 12.5234C15.9578 10.4961 17.6025 8.85132 19.6306 8.85132C20.687 8.85132 21.6411 9.29785 22.3113 10.0117C23.1479 9.84668 23.9336 9.54102 24.6433 9.12036C24.3687 9.97754 23.7866 10.6968 23.0283 11.1516C23.7712 11.0627 24.4792 10.8657 25.1372 10.5732C24.6458 11.3098 24.0225 11.9568 23.3054 12.4751Z"
+                  />
+                </svg>
+              </a>
+              <a href="javascript:void(0)" className="flex items-center justify-center w-8 h-8 founded-full mx-2 text-body-color hover:text-primary" aria-label="social-link">
+                <svg width="32" height="32" viewBox="0 0 32 32" className="fill-current">
+                  <path
+                    d="M16 0C7.16479 0 0 7.16479 0 16C0 24.8352 7.16479 32 16 32C24.8352 32 32 24.8352 32 16C32 7.16479 24.8352 0 16 0ZM11.3506 24.1875H7.45386V12.4641H11.3506V24.1875ZM9.40234 10.8633H9.37695C8.06934 10.8633 7.22363 9.96313 7.22363 8.83813C7.22363 7.68774 8.09521 6.8125 9.42822 6.8125C10.7612 6.8125 11.5815 7.68774 11.6069 8.83813C11.6069 9.96313 10.7612 10.8633 9.40234 10.8633ZM25.4014 24.1875H21.5051V17.9158C21.5051 16.3396 20.9409 15.2646 19.531 15.2646C18.4546 15.2646 17.8135 15.9897 17.5317 16.6897C17.4287 16.9402 17.4036 17.2903 17.4036 17.6406V24.1875H13.5071C13.5071 24.1875 13.5581 13.564 13.5071 12.4641H17.4036V14.124C17.9214 13.3252 18.8479 12.189 20.9153 12.189C23.479 12.189 25.4014 13.8645 25.4014 17.4653V24.1875Z"
+                  />
+                </svg>
+              </a>
+            </div>
+            <p className="font-medium text-base text-body-color text-center">All rights reserved by © Portfolio creative 2024</p>
+          </div>
+        </div>
+
+        <div className="absolute left-0 bottom-0 -z-1" aria-label="shape">
+          <span className="hidden">shape</span>
+          <svg width="143" height="138" viewBox="0 0 143 138" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="25" cy="118" r="101" stroke="url(#paint0_linear_52:83)" strokeWidth="34" />
+            <defs>
+              <linearGradient id="paint0_linear_52:83" x1="-12.7969" y1="-37.3359" x2="99.2109" y2="173.773" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div className="absolute right-3 top-3 -z-1" aria-label="shape">
+          <span className="hidden">shape</span>
+          <svg width="61" height="77" viewBox="0 0 61 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity="0.5">
+              <circle cx="45.0001" cy="1.66667" r="1.66667" transform="rotate(90 45.0001 1.66667)" fill="white" />
+              <circle cx="16.0001" cy="1.66667" r="1.66667" transform="rotate(90 16.0001 1.66667)" fill="white" />
+              <circle cx="59.0001" cy="1.66667" r="1.66667" transform="rotate(90 59.0001 1.66667)" fill="white" />
+              <circle cx="30.6668" cy="1.66667" r="1.66667" transform="rotate(90 30.6668 1.66667)" fill="white" />
+              <circle cx="1.66683" cy="1.66667" r="1.66667" transform="rotate(90 1.66683 1.66667)" fill="white" />
+              <circle cx="45.0001" cy="16.3332" r="1.66667" transform="rotate(90 45.0001 16.3332)" fill="white" />
+              <circle cx="16.0001" cy="16.3332" r="1.66667" transform="rotate(90 16.0001 16.3332)" fill="white" />
+              <circle cx="59.0001" cy="16.3332" r="1.66667" transform="rotate(90 59.0001 16.3332)" fill="white" />
+              <circle cx="30.6668" cy="16.3332" r="1.66667" transform="rotate(90 30.6668 16.3332)" fill="white" />
+              <circle cx="1.66683" cy="16.3332" r="1.66667" transform="rotate(90 1.66683 16.3332)" fill="white" />
+              <circle cx="45.0001" cy="31.0002" r="1.66667" transform="rotate(90 45.0001 31.0002)" fill="white" />
+              <circle cx="45.0001" cy="74.6667" r="1.66667" transform="rotate(90 45.0001 74.6667)" fill="white" />
+              <circle cx="16.0001" cy="31.0002" r="1.66667" transform="rotate(90 16.0001 31.0002)" fill="white" />
+              <circle cx="16.0001" cy="74.6667" r="1.66667" transform="rotate(90 16.0001 74.6667)" fill="white" />
+              <circle cx="59.0001" cy="31.0002" r="1.66667" transform="rotate(90 59.0001 31.0002)" fill="white" />
+              <circle cx="59.0001" cy="74.6667" r="1.66667" transform="rotate(90 59.0001 74.6667)" fill="white" />
+              <circle cx="30.6668" cy="31.0002" r="1.66667" transform="rotate(90 30.6668 31.0002)" fill="white" />
+              <circle cx="30.6668" cy="74.6667" r="1.66667" transform="rotate(90 30.6668 74.6667)" fill="white" />
+              <circle cx="1.66683" cy="31.0002" r="1.66667" transform="rotate(90 1.66683 31.0002)" fill="white" />
+              <circle cx="1.66683" cy="74.6667" r="1.66667" transform="rotate(90 1.66683 74.6667)" fill="white" />
+              <circle cx="45.0001" cy="45.6667" r="1.66667" transform="rotate(90 45.0001 45.6667)" fill="white" />
+              <circle cx="16.0001" cy="45.6667" r="1.66667" transform="rotate(90 16.0001 45.6667)" fill="white" />
+              <circle cx="59.0001" cy="45.6667" r="1.66667" transform="rotate(90 59.0001 45.6667)" fill="white" />
+              <circle cx="30.6668" cy="45.6667" r="1.66667" transform="rotate(90 30.6668 45.6667)" fill="white" />
+              <circle cx="1.66683" cy="45.6667" r="1.66667" transform="rotate(90 1.66683 45.6667)" fill="white" />
+              <circle cx="45.0001" cy="60.3332" r="1.66667" transform="rotate(90 45.0001 60.3332)" fill="white" />
+              <circle cx="16.0001" cy="60.3332" r="1.66667" transform="rotate(90 16.0001 60.3332)" fill="white" />
+              <circle cx="59.0001" cy="60.3332" r="1.66667" transform="rotate(90 59.0001 60.3332)" fill="white" />
+              <circle cx="30.6668" cy="60.3332" r="1.66667" transform="rotate(90 30.6668 60.3332)" fill="white" />
+              <circle cx="1.66683" cy="60.3332" r="1.66667" transform="rotate(90 1.66683 60.3332)" fill="white" />
+            </g>
+          </svg>
+        </div>
+      </footer>
+      {/* ====== Footer Section End  */}
+
+      {/* ====== Back To Top Start */}
+      <a
+        href="javascript:void(0)"
+        className="hidden items-center justify-center bg-primary text-white w-10 h-10 rounded-md fixed bottom-8 right-8 left-auto z-[999] hover:shadow-signUp transition duration-300 back-to-top"
+      >
+        <span className="w-3 h-3 border-t border-l border-white rotate-45 mt-[6px]"></span>
+      </a>
+      {/* ====== Back To Top End */}
+
+      {/* ====== All Scripts */}
+
+
+    </main>
+  );
+}

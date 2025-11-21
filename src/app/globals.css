@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@import "animate.css";
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"); */
+
+@theme {
+  --color-white: #FFFFFF;
+  --color-black: #090E34;
+  --color-dark: #1D2144;
+  --color-primary: #4A6CF7;
+  --color-yellow: #FBB040;
+  --color-body-color: #959CB1;
+
+  --breakpoint-sm: 540px;
+  --breakpoint-md: 720px;
+  --breakpoint-lg: 960px;
+  --breakpoint-xl: 1140px;
+  --breakpoint-2xl: 1320px;
+
+  --shadow-signUp: 0px 5px 10px rgba(4, 10, 34, 0.2);
+  --shadow-image: 0px 3px 30px rgba(9, 14, 52, 0.1);
+  --shadow-pricing: 0px 34px 68px rgba(0, 0, 0, 0.06);
+  --shadow-testimonial: 0px 8px 40px -10px rgba(9, 14, 52, 0.1);
+  --shadow-service: 0px 11px 41px -11px rgba(9, 14, 52, 0.1);
+  --shadow-blog: 0px 40px 150px -35px rgba(0, 0, 0, 0.05);
+}
+
+/* Container configuration */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Inter", sans-serif;
+}
+
+/* Custom styles */
+input[type="checkbox"]:checked~label span svg {
+  @apply inline-flex;
+}
+
+.sticky {
+  @apply !fixed !z-[9999] !transition !bg-white/80;
+  backdrop-filter: blur(5px);
+  box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.sticky .header-logo {
+  @apply py-4 lg:py-2;
+}
+
+.sticky .menu-scroll.active {
+  @apply text-primary;
+}
+
+.navbarTogglerActive>span:nth-child(1) {
+  @apply transform rotate-45 top-[7px];
+}
+
+.navbarTogglerActive>span:nth-child(2) {
+  @apply opacity-0;
+}
+
+.navbarTogglerActive>span:nth-child(3) {
+  @apply top-[-8px] rotate-[135deg];
+}
+
+.input-field {
+  @apply w-full rounded-sm py-4 px-8 bg-[#f8f8f9] border-b-2 border-transparent outline-none focus-visible:shadow-none focus:border-primary text-base font-medium text-body-color placeholder-body-color transition;
+}
+
+.portfolio-buttons button.active {
+  @apply bg-primary text-white;
+}
